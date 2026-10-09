@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.DS_Store
+browser-check.json
+scripts/browser_check.mjs
+design/
+public/*preview.html

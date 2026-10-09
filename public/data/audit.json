@@ -1,0 +1,31 @@
+{
+  "source": "Неделя 1_Визуализация_Датасет_Вариант А (1).csv",
+  "sha256": "dc6121b22e70254aa35f927aae877ae80c7e66d9acaebcdcb4c84432b0cbca4f",
+  "sourceRows": 5849,
+  "acceptedRows": 5738,
+  "excludedStatuses": {
+    "отменен": 111
+  },
+  "duplicateRows": 0,
+  "negativeRows": 0,
+  "missingRequired": 0,
+  "missingDeliveredTime": 111,
+  "amountMismatches": 0,
+  "discountMismatches": [],
+  "imageMatches": {
+    "exact": 385,
+    "brandAlias": 115
+  },
+  "unmatchedImages": [],
+  "minDate": "2021-09-05",
+  "maxDate": "2026-08-29",
+  "orders": 944,
+  "spend": 127879100,
+  "base": 130433400,
+  "savings": 2554300,
+  "quantity": 6534.0,
+  "goodsQuantity": 5244.0,
+  "products": 500,
+  "goodsProducts": 498,
+  "categories": 11
+}

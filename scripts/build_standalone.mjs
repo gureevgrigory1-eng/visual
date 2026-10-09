@@ -1,0 +1,27 @@
+import fs from 'node:fs'
+
+// The published document is also the portable, sandboxed hosting template.
+const target = 'standalone/index.html'
+const outer = fs.readFileSync(target, 'utf8')
+const attr = outer.match(/data-srcdoc="([^"]*)"/s)
+if (!attr) throw Error('Sandbox template is missing')
+const decode = s => s.replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&')
+const encode = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const inner = decode(attr[1])
+const app = inner.indexOf('<div id="app"></div>')
+const styleStart = inner.lastIndexOf('<style>', app)
+const scriptStart = inner.indexOf('<script type="module">', app)
+const scriptEnd = inner.indexOf('</script>', scriptStart)
+if (app < 0 || styleStart < 0 || scriptStart < 0 || scriptEnd < 0) throw Error('Application template bounds are missing')
+const assets = fs.readdirSync('dist/assets')
+const css = assets.filter(f => f.endsWith('.css')).map(f => fs.readFileSync('dist/assets/' + f, 'utf8')).join('\n')
+const entry = assets.filter(f => f.endsWith('.js'))
+if (entry.length !== 1) throw Error('Expected a single application entry')
+const js = fs.readFileSync('dist/assets/' + entry[0], 'utf8').replaceAll('</script', '<\\/script')
+const nextInner = inner.slice(0, styleStart) + '<style>' + css + '</style><div id="app"></div><script type="module">' + js + inner.slice(scriptEnd)
+const csp = s => [...s.matchAll(/<meta[^>]*Content-Security-Policy[^>]*>/g)].map(m => m[0])
+if (JSON.stringify(csp(inner)) !== JSON.stringify(csp(nextInner))) throw Error('Inner CSP changed')
+const next = outer.replace(attr[0], () => 'data-srcdoc="' + encode(nextInner) + '"')
+if (!next.includes('sandbox="allow-scripts"') || JSON.stringify(csp(outer)) !== JSON.stringify(csp(next))) throw Error('Outer security envelope changed')
+fs.writeFileSync(target, next)
+console.log('Built standalone/index.html with the original sandbox and CSP')
